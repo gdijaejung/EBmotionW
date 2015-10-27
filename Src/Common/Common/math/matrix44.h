@@ -1,5 +1,6 @@
 #pragma once
 
+
 namespace common
 {
 	struct Vector3;
@@ -22,17 +23,20 @@ namespace common
 
 		Matrix44();
 		inline void SetIdentity();
-		void	SetRotationX( const float angle );
-		void	SetRotationY( const float angle );
-		void	SetRotationZ( const float angle );
-		void	SetTranslate( const Vector3& pos );
-		void	SetScale( const Vector3& scale);
+		void SetRotationX( const float angle );
+		void SetRotationY( const float angle );
+		void SetRotationZ( const float angle );
+		void SetRotationXY(const Vector3 &xAxis, const Vector3 &yAxis);
+		void SetRotationXZ(const Vector3 &xAxis, const Vector3 &zAxis);
+		void SetRotationYZ(const Vector3 &yAxis, const Vector3 &zAxis);
+		void SetTranslate( const Vector3& pos );
+		void SetScale( const Vector3& scale);
 		Vector3 GetScale() const;
 		Vector3 GetPosition() const;
 		void SetPosition(const Vector3 &pos);
 		void SetView( const Vector3& pos, const Vector3& dir0, const Vector3& up0);
 		void SetView2( const Vector3& pos, const Vector3& lookAt, const Vector3& up0);
-		void	SetProjection( const float fov, const float aspect, const float nearPlane, const float farPlane );
+		void SetProjection( const float fov, const float aspect, const float nearPlane, const float farPlane );
 		Quaternion GetQuaternion() const;
 		Matrix44 Inverse() const;
 		Matrix44& Transpose();

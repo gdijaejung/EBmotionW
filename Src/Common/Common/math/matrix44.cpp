@@ -526,3 +526,71 @@ Matrix44& Matrix44::Transpose()
 	return *this;
 }
 
+
+// 기저벡터 x,y를 이용해 회전행렬을 만든다.
+void Matrix44::SetRotationXY(const Vector3 &xAxis, const Vector3 &yAxis)
+{
+	Vector3 zAxis = xAxis.CrossProduct(yAxis);
+	zAxis.Normalize();
+
+	_11 = xAxis.x;
+	_12 = xAxis.y;
+	_13 = xAxis.z;
+
+	_21 = yAxis.x;
+	_22 = yAxis.y;
+	_23 = yAxis.z;
+
+	_31 = zAxis.x;
+	_32 = zAxis.y;
+	_33 = zAxis.z;
+
+	_41 = _42 = _43 = 0;
+	_44 = 1;
+}
+
+
+// 기저벡터 x,z를 이용해 회전행렬을 만든다.
+void Matrix44::SetRotationXZ(const Vector3 &xAxis, const Vector3 &zAxis)
+{
+	Vector3 yAxis = zAxis.CrossProduct(xAxis);
+	yAxis.Normalize();
+
+	_11 = xAxis.x;
+	_12 = xAxis.y;
+	_13 = xAxis.z;
+
+	_21 = yAxis.x;
+	_22 = yAxis.y;
+	_23 = yAxis.z;
+
+	_31 = zAxis.x;
+	_32 = zAxis.y;
+	_33 = zAxis.z;
+
+	_41 = _42 = _43 = 0;
+	_44 = 1;
+}
+
+
+// 기저벡터 y,z를 이용해 회전행렬을 만든다.
+void Matrix44::SetRotationYZ(const Vector3 &yAxis, const Vector3 &zAxis)
+{
+	Vector3 xAxis = yAxis.CrossProduct(zAxis);
+	xAxis.Normalize();
+
+	_11 = xAxis.x;
+	_12 = xAxis.y;
+	_13 = xAxis.z;
+
+	_21 = yAxis.x;
+	_22 = yAxis.y;
+	_23 = yAxis.z;
+
+	_31 = zAxis.x;
+	_32 = zAxis.y;
+	_33 = zAxis.z;
+
+	_41 = _42 = _43 = 0;
+	_44 = 1;
+}

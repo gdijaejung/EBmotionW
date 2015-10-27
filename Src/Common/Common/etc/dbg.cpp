@@ -11,7 +11,7 @@ using namespace dbg;
 void dbg::Print( const std::string &str)
 {
 	OutputDebugStringA(str.c_str());
-	OutputDebugStringA("\n");
+	//OutputDebugStringA("\n");
 }
 
 
