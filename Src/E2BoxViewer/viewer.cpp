@@ -1,6 +1,7 @@
 
 #include "stdafx.h"
 #include "gbone.h"
+#include "../Common/Graphic/character/character.h"
 
 
 #include <objidl.h>
@@ -30,13 +31,14 @@ private:
 	cGBone m_characterBone[15];
 	cGBone m_sensorBone[15];
 
-	Matrix44 m_retargetTm[15];
-
 	Quaternion m_q[15];
 	Matrix44 m_localTm[15];
-	Matrix44 m_offsetLocalTm[15];
+	Matrix44 m_initLocalTm[15];
 	Matrix44 m_worldTm[15];
+	Matrix44 m_worldOffsetTm[15];
+	Matrix44 m_retargetTm[15];
 
+	graphic::cCharacter m_character;
 
 	graphic::cSphere m_sphere;
 
@@ -112,6 +114,8 @@ bool cViewer::OnInit()
 
 	Gdiplus::GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL);
 
+	graphic::cResourceManager::Get()->SetMediaDirectory("./");
+
 	m_renderer.GetDevice()->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
 	m_renderer.GetDevice()->LightEnable(0, true);
 
@@ -141,15 +145,41 @@ bool cViewer::OnInit()
 		m_characterBone[i].Init(m_renderer);
 		m_sensorBone[i].Init(m_renderer);
 		m_sensorBone[i].m_cube.GetMaterial().InitBlack();
+		m_worldOffsetTm[i].SetIdentity();
 		m_retargetTm[i].SetIdentity();
 		m_localTm[i].SetIdentity();
-		m_offsetLocalTm[i].SetIdentity();
+		m_initLocalTm[i].SetIdentity();
 	}
 
-	// 	m_characterInitTm[7].SetRotationXY(Vector3(1, 0, -1).Normal(), Vector3(0, 1, 0));
-	// 	m_characterInitTm[8].SetRotationXY(Vector3(1, 0, -1).Normal(), Vector3(0, 1, 0));
-	// 	m_characterInitTm[9].SetRotationXY(Vector3(1, 0, -1).Normal(), Vector3(0, 1, 0));
 
+	//-----------------------------------------------------------------------------------
+	// 캐릭터 리타겟팅
+	{
+		m_character.Create(m_renderer, "zealot.dat");
+		if (graphic::cMesh* mesh = m_character.GetMesh("Sphere001"))
+			mesh->SetRender(false);
+		//m_character.SetShader( graphic::cResourceManager::Get()->LoadShader(
+		//	"hlsl_skinning_using_texcoord.fx") );
+		m_character.SetShader(graphic::cResourceManager::Get()->LoadShader(
+			m_renderer,
+			"hlsl_skinning_using_texcoord_sc2.fx"));
+		m_character.SetRenderShadow(true);
+		m_character.SetToolTransform({ Vector3(0,0,-20), {}, Vector3(10, 10, 10) }); // 사이즈 늘림
+
+		using namespace graphic;
+
+		vector<sActionData> actions;
+		actions.reserve(16);
+		actions.push_back(sActionData(CHARACTER_ACTION::NORMAL, "zealot_stand.ani"));
+		actions.push_back(sActionData(CHARACTER_ACTION::RUN, "zealot_walk.ani"));
+		actions.push_back(sActionData(CHARACTER_ACTION::ATTACK, "zealot_attack.ani"));
+		//m_character.SetActionData(actions);
+
+		//m_character.GetBoneMgr()->FindBone("");
+		//m_character.Action( CHARACTER_ACTION::RUN );
+		//m_character.SetAction(new ai::cAction(&m_character, "normal", "zealot_stand.ani"));
+		//m_character.StartAction();
+	}
 
 	return true;
 }
@@ -157,6 +187,8 @@ bool cViewer::OnInit()
 
 void cViewer::OnUpdate(const float elapseT)
 {
+	m_character.Move(elapseT);
+
 	char buff[512];
 	const int len = m_udpServer.GetRecvData(buff, sizeof(buff));
 	if (len > 0)
@@ -196,9 +228,6 @@ void cViewer::OnUpdate(const float elapseT)
 
 			if (pid < 0) // root
 			{
-				//m_localTm[id].SetIdentity();
-//				m_worldTm[id] = qtm;
-
 				// 0번 센서의 Y축이 바라보는 방향을 정면(zAxis)으로 한다.
 				// Y축은 바닥에서 수평하게 만들고, 새 좌표계를 정의한다.
 				const Vector3 zAxis = Vector3(0, 1, 0).MultiplyNormal(qtm);
@@ -209,19 +238,13 @@ void cViewer::OnUpdate(const float elapseT)
 				Matrix44 baseTm;
 				baseTm.SetRotationYZ(Vector3(0, 1, 0), front);
 
-				m_worldTm[id] = baseTm;
-				m_localTm[id] = baseTm;
+ 				m_worldTm[id] = baseTm;
+ 				m_localTm[id] = baseTm;
 			}
 			else
 			{
 				m_worldTm[id] = qtm * m_worldTm[0].Inverse(); // Root의 상대 회전값을 저장한다.
 				m_localTm[id] = m_worldTm[id] * m_worldTm[pid].Inverse();
-
-// 				if (id >= 3 && id <= 8)
-// 				{
-// 					m_worldTm[id] = qtm * m_worldTm[0].Inverse(); // Root의 상대 회전값을 저장한다.
-// 					m_worldTm[id] = m_worldTm[id].Inverse();
-// 				}
 			}
 		}
 	}
@@ -261,6 +284,36 @@ void cViewer::OnRender(const float elapseT)
 				m_characterBone[i].Render(m_renderer, m_worldTm[i] * t0);
 			}
 
+			Vector3 mov[15] = {
+				Vector3(0, 0, 0), //0
+				Vector3(0, 5, 0), //1
+				Vector3(0, 10, 0), //2
+
+				Vector3(-2, -3, 0),//3
+				Vector3(-2, -8, 0),//4
+				Vector3(-2, -13, 0),//5
+
+				Vector3(2, -3, 0),//6
+				Vector3(2, -8, 0),//7
+				Vector3(2, -13, 0),//8
+
+				Vector3(-5, 5, 0),//9
+				Vector3(-10, 5, 0),//10
+				Vector3(-13, 5, 0),//11
+
+				Vector3(5, 5, 0),//12
+				Vector3(10, 5, 0),//13
+				Vector3(13, 5, 0),//14
+			};
+
+			for (int i = 0; i < 15; ++i)
+			{
+				Vector3 charPos(mov[i] + Vector3(0,0,20));
+				Matrix44 t0;
+				t0.SetPosition(charPos);
+				m_characterBone[i].Render(m_renderer, m_worldTm[i] * t0);
+			}
+
 		}
 		else
  		{
@@ -288,37 +341,39 @@ void cViewer::OnRender(const float elapseT)
 				Vector3(3, 0, 0),//14
 			};
 
-			for (int i = 0; i < 2; ++i)
+			for (int i = 0; i < 15; ++i)
 			{
 				const int id = i;
 				const int pid = GetParentBone(id);
 
 				Matrix44 t0;
 				t0.SetPosition(mov[id]);
-				//Matrix44 tm = m_retargetTm[id] * m_worldTm[id];
-				Matrix44 tm = m_offsetLocalTm[id].Inverse() * m_localTm[id];
+				Matrix44 tm = m_worldOffsetTm[id] * m_worldTm[id];
+				//Matrix44 tm = m_offsetLocalTm[id].Inverse() * m_localTm[id];
 				//Matrix44 tm = m_localTm[id];
 				paletteTm[id] = tm;
 
  				Matrix44 finalTm;
 				if (pid < 0)
 				{
-					//finalTm = m_worldTm[id] * t0;
-					//tm = m_localTm[id];
+					tm.SetIdentity();
+					paletteTm[id] = tm * t0;
 					finalTm = tm * t0;
 					incrementPaletteTm[id] = finalTm;
 				}
 				else
 				{
-					//finalTm = tm * paletteTm[pid].Inverse() * t0 * incrementPaletteTm[pid];
-					finalTm = tm * t0 * incrementPaletteTm[pid];
+					finalTm = tm * paletteTm[pid].Inverse() * t0 * incrementPaletteTm[pid];
+					//finalTm = tm * t0 * incrementPaletteTm[pid];
+					//finalTm = tm * t0;
 					incrementPaletteTm[id] = finalTm;
 				}
 
 				m_characterBone[i].Render(m_renderer, finalTm);
 			}
+		}
 
-		}	
+		m_character.Render(m_renderer, Matrix44::Identity);
 
 		m_renderer.RenderFPS();
 
@@ -419,9 +474,10 @@ void cViewer::MessageProc(UINT message, WPARAM wParam, LPARAM lParam)
 					baseTm.SetRotationYZ(Vector3(0, 1, 0), front);
 
 					m_localTm[id] = baseTm;
-					m_offsetLocalTm[id] = baseTm;
+					m_initLocalTm[id] = baseTm;
 					m_worldTm[id] = baseTm;
-					m_retargetTm[id] = baseTm.Inverse();
+					m_worldOffsetTm[id] = baseTm.Inverse();
+					m_retargetTm[id].SetIdentity();
 				}
 				else
 				{
@@ -429,10 +485,12 @@ void cViewer::MessageProc(UINT message, WPARAM wParam, LPARAM lParam)
 					m_worldTm[id] = qtm * baseTm.Inverse();
 					m_localTm[id] = m_worldTm[id] * m_worldTm[pid].Inverse();
 
-					m_offsetLocalTm[id] = m_worldTm[id] * m_worldTm[pid].Inverse();
-					m_retargetTm[id] = m_worldTm[id].Inverse();
+					m_initLocalTm[id] = m_worldTm[id] * m_worldTm[pid].Inverse();
+					m_worldOffsetTm[id] = m_worldTm[id].Inverse();
 
-					//m_localTm[id] = m_worldTm[id] * m_worldTm[pid].Inverse();
+					Matrix44 retTm;
+					retTm.SetRotationXY(Vector3(1, 0, 0), Vector3(0, 1, 0));
+					m_retargetTm[id] = m_localTm[id].Inverse() * retTm;
 				}
 			}
 		}
