@@ -30,25 +30,18 @@ private:
 	cGBone m_characterBone[15];
 	cGBone m_sensorBone[15];
 
-	Matrix44 m_characterInitTm[15];
-	Matrix44 m_retargetTm[15]; // sensorTM -> characterTM 으로 변환하는 행렬
-
+	Matrix44 m_retargetTm[15];
 
 	Quaternion m_q[15];
-	Matrix44 m_offset[15];
-	Matrix44 m_heading[15];
 	Matrix44 m_localTm[15];
-	Matrix44 m_localTm2[15];
-
-	Matrix44 m_firstLocalTm[15];
+	Matrix44 m_offsetLocalTm[15];
 	Matrix44 m_worldTm[15];
-
 
 
 	graphic::cSphere m_sphere;
 
 	bool m_dbgPrint;
-	bool m_localDisplay;
+	bool m_displayType;
 
 	string m_filePath;
 	POINT m_curPos;
@@ -72,7 +65,7 @@ cViewer::cViewer()
 	m_windowRect = r;
 
 	m_dbgPrint = false;
-	m_localDisplay = true;
+	m_displayType = true;
 
 	m_LButtonDown = false;
 	m_RButtonDown = false;
@@ -86,6 +79,33 @@ cViewer::~cViewer()
 }
 
 
+// -1 이면 부모 뼈대가 없다는 뜻.
+int GetParentBone(const int id)
+{
+	switch (id)
+	{
+	case 0: return -1;
+	case 1: return 0;
+	case 2: return 1;
+	case 3: return 0;
+	case 4: return 3;
+	case 5: return 4;
+	case 6: return 0;
+	case 7: return 6;
+	case 8: return 7;
+	case 9: return 1;
+	case 10: return 9;
+	case 11: return 10;
+	case 12: return 1;
+	case 13: return 12;
+	case 14: return 13;
+	default:
+		break;
+	}
+	return -1;
+}
+
+
 bool cViewer::OnInit()
 {
 	DragAcceptFiles(m_hWnd, TRUE);
@@ -95,26 +115,10 @@ bool cViewer::OnInit()
 	m_renderer.GetDevice()->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
 	m_renderer.GetDevice()->LightEnable(0, true);
 
-	for (int i = 0; i < 15; ++i)
-	{
-		m_cube[i].SetCube(m_renderer, Vector3(-1, -1, -1), Vector3(1, 1, 1));
-		m_characterBone[i].Init(m_renderer);
-		m_sensorBone[i].Init(m_renderer);
-		m_sensorBone[i].m_cube.GetMaterial().InitBlack();
-		m_retargetTm[i].SetIdentity();
-	}
-
-	m_characterInitTm[7].SetRotationXY(Vector3(1, 0, -1).Normal(), Vector3(0, 1, 0));
-	m_characterInitTm[8].SetRotationXY(Vector3(1, 0, -1).Normal(), Vector3(0, 1, 0));
-	m_characterInitTm[9].SetRotationXY(Vector3(1, 0, -1).Normal(), Vector3(0, 1, 0));
-
-
-
-
 	const int WINSIZE_X = 1024;		//초기 윈도우 가로 크기
 	const int WINSIZE_Y = 768;	//초기 윈도우 세로 크기
 	GetMainCamera()->Init(&m_renderer);
-	GetMainCamera()->SetCamera(Vector3(20, 20, -20), Vector3(0, 0, 0), Vector3(0, 1, 0));
+ 	GetMainCamera()->SetCamera(Vector3(30, 30, -30), Vector3(0, 0, 0), Vector3(0, 1, 0));
 	GetMainCamera()->SetProjection(D3DX_PI / 4.f, (float)WINSIZE_X / (float)WINSIZE_Y, 1.f, 10000.0f);
 
 	const Vector3 lightPos(300, 300, -300);
@@ -127,12 +131,25 @@ bool cViewer::OnInit()
 	m_udpServer.Init(0, 8888);
 	m_udpServer.m_sleepMillis = 0;
 
+
+	//-----------------------------------------------------------------------------------
+	// 본격적인 스켈레톤 초기화 작업
+
 	for (int i = 0; i < 15; ++i)
 	{
-		m_offset[i].SetIdentity();
-		m_heading[i].SetIdentity();
+		m_cube[i].SetCube(m_renderer, Vector3(-1, -1, -1), Vector3(1, 1, 1));
+		m_characterBone[i].Init(m_renderer);
+		m_sensorBone[i].Init(m_renderer);
+		m_sensorBone[i].m_cube.GetMaterial().InitBlack();
+		m_retargetTm[i].SetIdentity();
 		m_localTm[i].SetIdentity();
+		m_offsetLocalTm[i].SetIdentity();
 	}
+
+	// 	m_characterInitTm[7].SetRotationXY(Vector3(1, 0, -1).Normal(), Vector3(0, 1, 0));
+	// 	m_characterInitTm[8].SetRotationXY(Vector3(1, 0, -1).Normal(), Vector3(0, 1, 0));
+	// 	m_characterInitTm[9].SetRotationXY(Vector3(1, 0, -1).Normal(), Vector3(0, 1, 0));
+
 
 	return true;
 }
@@ -156,76 +173,56 @@ void cViewer::OnUpdate(const float elapseT)
 			if (m_dbgPrint)
 				dbg::Print(common::format("{%d} %s", cnt++, buff));
 
-			int nid = 0;
 			const int i = toks[0].find('-');
 			if (string::npos == i)
 				return;
 
-			const string id = toks[0].substr(i + 1);
-			nid = atoi(id.c_str());
-			if (nid < 0)
+			const string idStr = toks[0].substr(i + 1);
+			const int id = atoi(idStr.c_str());
+			if (id < 0)
 				return;
 
 			const float x = (float)atof(toks[1].c_str());
 			const float y = (float)atof(toks[2].c_str());
 			const float z = (float)atof(toks[3].c_str());
 			const float w = (float)atof(toks[4].c_str());
-			Quaternion q(y, x, z, w);
-
-			m_q[nid] = q;
+			const Quaternion q(y, x, z, w);
+  
+			m_q[id] = q;
 			const Matrix44 qtm = q.GetMatrix();
-			//m_localTm[nid] = m_offset[nid] * q.GetMatrix();
-			m_sensorBone[nid].m_worldTm = qtm;
+			m_sensorBone[id].m_worldTm = qtm;
 
-			if (nid == 0)
+			const int pid = GetParentBone(id);
+
+			if (pid < 0) // root
 			{
-// 				const Vector3 zAxis = Vector3(0, 1, 0).MultiplyNormal(qtm);
-// 				const Vector3 xAxis = Vector3(1, 0, 0).MultiplyNormal(qtm);
-// 				Matrix44 baseTm;
-// 				baseTm.SetRotationXZ(xAxis, zAxis);
-				//m_localTm2[nid] = baseTm;
-				m_localTm[nid].SetIdentity();
+				//m_localTm[id].SetIdentity();
+//				m_worldTm[id] = qtm;
+
+				// 0번 센서의 Y축이 바라보는 방향을 정면(zAxis)으로 한다.
+				// Y축은 바닥에서 수평하게 만들고, 새 좌표계를 정의한다.
+				const Vector3 zAxis = Vector3(0, 1, 0).MultiplyNormal(qtm);
+				Vector3 right = Vector3(0, 1, 0).CrossProduct(zAxis);
+				right.Normalize();
+				Vector3 front = right.CrossProduct(Vector3(0, 1, 0));
+				front.Normalize();
+				Matrix44 baseTm;
+				baseTm.SetRotationYZ(Vector3(0, 1, 0), front);
+
+				m_worldTm[id] = baseTm;
+				m_localTm[id] = baseTm;
 			}
 			else
 			{
-				m_worldTm[nid] = qtm * m_worldTm[0].Inverse();
+				m_worldTm[id] = qtm * m_worldTm[0].Inverse(); // Root의 상대 회전값을 저장한다.
+				m_localTm[id] = m_worldTm[id] * m_worldTm[pid].Inverse();
 
-				if (nid == 9)
-				{
-					Matrix44 local = m_worldTm[nid];
-					m_localTm2[nid] = local;
-				}
-				else if (nid == 8)
-				{
-					Matrix44 local = m_worldTm[nid] * m_worldTm[9].Inverse();
-					m_localTm2[nid] = m_localTm[nid].Inverse() * local;
-				}
-				else if (nid == 7)
-				{
-					Matrix44 local = m_worldTm[nid] * m_worldTm[8].Inverse();
-					m_localTm2[nid] = m_localTm[nid].Inverse() * local;
-				}
-				if (nid == 4)
-				{
-					Matrix44 local = m_worldTm[nid];
-					m_localTm2[nid] = local;
-				}
-				else if (nid == 6)
-				{
-					Matrix44 local = m_worldTm[nid] * m_worldTm[4].Inverse();
-					m_localTm2[nid] = m_localTm[nid].Inverse() * local;
-				}
-				else if (nid == 14)
-				{
-					Matrix44 local = m_worldTm[nid] * m_worldTm[6].Inverse();
-					m_localTm2[nid] = m_localTm[nid].Inverse() * local;
-				}
-				else
-				{
-					m_localTm2[nid] = m_worldTm[nid];
-				}
+// 				if (id >= 3 && id <= 8)
+// 				{
+// 					m_worldTm[id] = qtm * m_worldTm[0].Inverse(); // Root의 상대 회전값을 저장한다.
+// 					m_worldTm[id] = m_worldTm[id].Inverse();
+// 				}
 			}
-
 		}
 	}
 }
@@ -246,95 +243,80 @@ void cViewer::OnRender(const float elapseT)
 		q.SetRotationArc(Vector3(1, 0, 0), Vector3(-1, 0, 0), Vector3(0, 1, 0));
 		Matrix44 worldTm = q.GetMatrix();
 
-		if (m_localDisplay)
+		if (m_displayType)
 		{
-			//m_cube[7].Render(m_renderer, m_localTm[7]);
-			
-// 			Matrix44 t1;
-// 			t1.SetPosition(Vector3(-5, 0, 0));
-// 			m_cube[8].Render(m_renderer, m_localTm[8] * t1);
-// 
-// 			Matrix44 t2;
-// 			t2.SetPosition(Vector3(-10, 0, 0));
-// 			m_cube[9].Render(m_renderer, m_localTm[9] * t2);
-
+			for (int i = 0; i < 15; ++i)
 			{
-				Vector3 sensorPos(-10, 0, 0);
+				Vector3 sensorPos(-5.f-((i%4)*5.f), 0, (i/4)*5.f - 5.f);
 				Matrix44 t0;
 				t0.SetPosition(sensorPos);
-				m_sensorBone[0].Render(m_renderer, m_sensorBone[0].m_worldTm * t0);
-				Matrix44 t1;
-				t1.SetPosition(sensorPos + Vector3(-15, 0, 0));
-				m_sensorBone[7].Render(m_renderer, m_sensorBone[7].m_worldTm * t1);
-				Matrix44 t2;
-				t2.SetPosition(sensorPos + Vector3(-10, 0, 0));
-				m_sensorBone[8].Render(m_renderer, m_sensorBone[8].m_worldTm * t2);
-				Matrix44 t3;
-				t2.SetPosition(sensorPos + Vector3(-5, 0, 0));
-				m_sensorBone[9].Render(m_renderer, m_sensorBone[9].m_worldTm * t2);
+				m_sensorBone[i].Render(m_renderer, m_sensorBone[i].m_worldTm * t0);
 			}
 
+			for (int i = 0; i < 15; ++i)
 			{
-				Vector3 charPos(10, 0, 0);
+				Vector3 charPos(20.f - ((i % 4)*5.f), 0, (i / 4)*5.f - 5.f);
 				Matrix44 t0;
  				t0.SetPosition(charPos);
-				m_characterBone[0].Render(m_renderer, m_worldTm[0] * t0);
-				Matrix44 t1;
-				t1.SetPosition(charPos + Vector3(-15, 0, 0));
-				m_characterBone[7].Render(m_renderer, m_worldTm[7] * t1);
-				Matrix44 t2;
-				t2.SetPosition(charPos + Vector3(-10, 0, 0));
-				m_characterBone[8].Render(m_renderer, m_worldTm[8] * t2);
-				Matrix44 t3;
-				t3.SetPosition(charPos + Vector3(-5, 0, 0));
-				m_characterBone[9].Render(m_renderer, m_worldTm[9] * t3);
+				m_characterBone[i].Render(m_renderer, m_worldTm[i] * t0);
 			}
 
 		}
 		else
-		{
+ 		{
+			Matrix44 paletteTm[15];
+			Matrix44 incrementPaletteTm[15];
+			Vector3 mov[15] = {
+				Vector3(0, 0, 0), //0
+				Vector3(0, 5, 0), //1
+				Vector3(0, 5, 0), //2
+
+				Vector3(-2, -3, 0),//3
+				Vector3(0, -5, 0),//4
+				Vector3(0, -5, 0),//5
+
+				Vector3(2, -3, 0),//6
+				Vector3(0, -5, 0),//7
+				Vector3(0, -5, 0),//8
+
+				Vector3(-5, 0, 0),//9
+				Vector3(-5, 0, 0),//10
+				Vector3(-3, 0, 0),//11
+
+				Vector3(5, 0, 0),//12
+				Vector3(5, 0, 0),//13
+				Vector3(3, 0, 0),//14
+			};
+
+			for (int i = 0; i < 2; ++i)
 			{
+				const int id = i;
+				const int pid = GetParentBone(id);
+
 				Matrix44 t0;
-				t0.SetPosition(Vector3(-2, 0, 0));
-				Matrix44 p1 = m_retargetTm[9] * m_worldTm[9];
-				m_cube[9].Render(m_renderer, p1 * t0); 
+				t0.SetPosition(mov[id]);
+				//Matrix44 tm = m_retargetTm[id] * m_worldTm[id];
+				Matrix44 tm = m_offsetLocalTm[id].Inverse() * m_localTm[id];
+				//Matrix44 tm = m_localTm[id];
+				paletteTm[id] = tm;
 
- 				Matrix44 t1;
- 				t1.SetPosition(Vector3(-5, 0, 0));
-				Matrix44 p2 = m_retargetTm[8] * m_worldTm[8];
-				m_cube[8].Render(m_renderer, p2 * p1.Inverse() * t1 * p1);
+ 				Matrix44 finalTm;
+				if (pid < 0)
+				{
+					//finalTm = m_worldTm[id] * t0;
+					//tm = m_localTm[id];
+					finalTm = tm * t0;
+					incrementPaletteTm[id] = finalTm;
+				}
+				else
+				{
+					//finalTm = tm * paletteTm[pid].Inverse() * t0 * incrementPaletteTm[pid];
+					finalTm = tm * t0 * incrementPaletteTm[pid];
+					incrementPaletteTm[id] = finalTm;
+				}
 
-				Matrix44 t2;
-  				t2.SetPosition(Vector3(-5, 0, 0));
-				Matrix44 p3 = m_retargetTm[7] * m_worldTm[7];
-  				m_cube[7].Render(m_renderer, 
-					p3 * p2.Inverse() * t2 *
-					p2 * p1.Inverse() * t1 * p1);
-
+				m_characterBone[i].Render(m_renderer, finalTm);
 			}
-
-
-
-			{
-				Matrix44 t0;
-				t0.SetPosition(Vector3(2, 0, 0));
-				Matrix44 p1 = m_retargetTm[4] * m_worldTm[4];
-				m_cube[4].Render(m_renderer, p1 * t0);
-
-				Matrix44 t1;
-				t1.SetPosition(Vector3(5, 0, 0));
-				Matrix44 p2 = m_retargetTm[6] * m_worldTm[6];
-				m_cube[6].Render(m_renderer, p2 * p1.Inverse() * t1 * p1);
-
-				Matrix44 t2;
-				t2.SetPosition(Vector3(5, 0, 0));
-				Matrix44 p3 = m_retargetTm[14] * m_worldTm[14];
-				m_cube[14].Render(m_renderer,
-					p3 * p2.Inverse() * t2 *
-					p2 * p1.Inverse() * t1 * p1);
-
-			}
-
 
 		}	
 
@@ -419,95 +401,45 @@ void cViewer::MessageProc(UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			Matrix44 baseTm;
 
-			const int indices[] = { 0, 9, 8, 7, 3, 4, 6, 14, 2, 1, 0, 5, 13, 12, 11, 10 };
 			for (int k = 0; k < 15; ++k)
 			{
-				const int idx = indices[k];
-				Quaternion q;
- 				//q.SetRotationArc(Vector3(1, 0, 0), Vector3(-1, 0, 0), Vector3(0, 1, 0));
-				Vector3 front = Vector3(1, 0, 0).MultiplyNormal(m_q[idx].GetMatrix());
-				front.Normalize();
-				q.SetRotationArc(front, Vector3(1, 0, 0), Vector3(0, 1, 0));
+				const int id = k;
+				const int pid = GetParentBone(k);
+				const Matrix44 qtm = m_q[id].GetMatrix();
 
-				Vector3 up = Vector3(0, 1, 0).MultiplyNormal(m_q[idx].GetMatrix());
-				up.Normalize();
-				Quaternion qUp;
-				qUp.SetRotationArc(up, Vector3(0, 1, 0), Vector3(0, 0, 1));
-
-// 				Matrix44 rt;
-// 				rt = (q *qUp).GetMatrix();
-				//rt.SetRotationXY(Vector3(1,0,0), 
-
-				Matrix44 rt;
-				rt.SetRotationXY(Vector3(1, 0, 0), Vector3(0, 1, 0));
-				// m_q[i] * T = rt
-				// inverse(m_q[i]) * rt = T
-				 
-				m_offset[idx] = m_q[idx].GetMatrix().Inverse();
-				m_heading[idx] = m_q[idx].GetMatrix().Inverse() * rt;
-
-				if (idx == 0)
+				if (pid < 0) // root
 				{
-					const Matrix44 t = m_q[idx].GetMatrix();
-					const Vector3 zAxis = Vector3(0,1,0).MultiplyNormal(t);
+					// 0번 센서의 Y축이 바라보는 방향을 정면(zAxis)으로 한다.
+					// Y축은 바닥에서 수평하게 만들고, 새 좌표계를 정의한다.
+					const Vector3 zAxis = Vector3(0, 1, 0).MultiplyNormal(qtm);
 					Vector3 right = Vector3(0, 1, 0).CrossProduct(zAxis);
 					right.Normalize();
 					Vector3 front = right.CrossProduct(Vector3(0, 1, 0));
 					front.Normalize();
-
-//					const Vector3 xAxis = Vector3(0,0,1).MultiplyNormal(t);
 					baseTm.SetRotationYZ(Vector3(0, 1, 0), front);
 
-// 					Matrix44 basis;
-// 					basis.SetRotationXY(Vector3(1, 0, 0), Vector3(0, 1, 0));
-					
-					m_worldTm[idx] = baseTm;
+					m_localTm[id] = baseTm;
+					m_offsetLocalTm[id] = baseTm;
+					m_worldTm[id] = baseTm;
+					m_retargetTm[id] = baseTm.Inverse();
 				}
 				else
 				{
- 					m_worldTm[idx] = m_q[idx].GetMatrix() * baseTm.Inverse();
+					// Root의 상대 변환 값을 world로 지정한다.
+					m_worldTm[id] = qtm * baseTm.Inverse();
+					m_localTm[id] = m_worldTm[id] * m_worldTm[pid].Inverse();
 
-					Matrix44 basisTm;
-					basisTm.SetRotationXY(Vector3(1, 0, 0), Vector3(0, 1, 0));
-					m_retargetTm[idx] = m_worldTm[idx].Inverse();// *basisTm;
+					m_offsetLocalTm[id] = m_worldTm[id] * m_worldTm[pid].Inverse();
+					m_retargetTm[id] = m_worldTm[id].Inverse();
 
-					if (idx == 9)
-					{
-						m_localTm[idx] = m_worldTm[idx] * m_worldTm[0].Inverse();
-					}
-					else if (idx == 8)
-					{
-						m_localTm[idx] = m_worldTm[idx] * m_worldTm[9].Inverse();
-					}
-					else if (idx == 7)
-					{
-						m_localTm[idx] = m_worldTm[idx] * m_worldTm[8].Inverse();
-					}
-					if (idx == 4)
-					{
-						m_localTm[idx] = m_worldTm[idx] * m_worldTm[0].Inverse();
-					}
-					else if (idx == 6)
-					{
-						m_localTm[idx] = m_worldTm[idx] * m_worldTm[4].Inverse();
-					}
-					else if (idx == 14)
-					{
-						m_localTm[idx] = m_worldTm[idx] * m_worldTm[6].Inverse();
-					}
-					else
-					{
-						m_localTm[idx] = m_worldTm[idx];
-					}
-
+					//m_localTm[id] = m_worldTm[id] * m_worldTm[pid].Inverse();
 				}
-
 			}
 		}
 		break;
 
 		case VK_RETURN:
-			m_localDisplay = !m_localDisplay;
+			m_displayType = !m_displayType;
 			break;
 
 		}
