@@ -369,7 +369,10 @@ void cViewer::OnRender(const float elapseT)
 					incrementPaletteTm[id] = finalTm;
 				}
 
-				m_characterBone[i].Render(m_renderer, finalTm);
+				Matrix44 rot;
+				rot.SetRotationY(45);
+
+				m_characterBone[i].Render(m_renderer, finalTm * m_worldTm[0]);
 			}
 		}
 
