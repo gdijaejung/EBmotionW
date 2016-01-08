@@ -4,9 +4,26 @@
     <ClCompile Include="viewer.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="gbone.cpp" />
+    <ClCompile Include="..\Common\UIComponent\Serial.cpp">
+      <Filter>UIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\UIComponent\BufferedSerial.cpp">
+      <Filter>UIComponent</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="gbone.h" />
+    <ClInclude Include="..\Common\UIComponent\Serial.h">
+      <Filter>UIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\UIComponent\BufferedSerial.h">
+      <Filter>UIComponent</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="UIComponent">
+      <UniqueIdentifier>{37d9ea4b-0194-462a-ab53-9a8cdeb3fd42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

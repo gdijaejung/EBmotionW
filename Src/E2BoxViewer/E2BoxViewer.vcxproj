@@ -78,6 +78,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\UIComponent\BufferedSerial.cpp" />
+    <ClCompile Include="..\Common\UIComponent\Serial.cpp" />
     <ClCompile Include="gbone.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -85,6 +87,8 @@
     <ClCompile Include="viewer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\UIComponent\BufferedSerial.h" />
+    <ClInclude Include="..\Common\UIComponent\Serial.h" />
     <ClInclude Include="gbone.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

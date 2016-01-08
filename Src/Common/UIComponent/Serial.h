@@ -3,6 +3,8 @@
 #ifndef __SERIAL_H__
 #define __SERIAL_H__
 
+#include <windows.h>
+
 #define FC_DTRDSR       0x01
 #define FC_RTSCTS       0x02
 #define FC_XONXOFF      0x04
@@ -27,7 +29,7 @@ public:
 	int SendData( const char *, int );
 	int ReadDataWaiting( void );
 
-	BOOL IsOpened( void ) const { return( m_bOpened ); }
+	BOOL IsOpened( void ){ return( m_bOpened ); }
 
 protected:
 	BOOL WriteCommByte( unsigned char );

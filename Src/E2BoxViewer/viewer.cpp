@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "gbone.h"
 #include "../Common/Graphic/character/character.h"
+#include "../Common/UIComponent/BufferedSerial.h"
 
 
 #include <objidl.h>
@@ -26,6 +27,7 @@ public:
 
 private:
 	network::cUDPServer m_udpServer;
+	CBufferedSerial m_serial;
 
 	graphic::cCube2 m_cube[15];
 	cGBone m_characterBone[15];
@@ -44,6 +46,8 @@ private:
 
 	bool m_dbgPrint;
 	bool m_displayType;
+	cText m_textSerial;
+	cText m_textQuat;
 
 	string m_filePath;
 	POINT m_curPos;
@@ -132,9 +136,9 @@ bool cViewer::OnInit()
 	GetMainLight().Init(cLight::LIGHT_DIRECTIONAL,
 		Vector4(0.7f, 0.7f, 0.7f, 0), Vector4(0.2f, 0.2f, 0.2f, 0));
 
-	m_udpServer.Init(0, 8888);
-	m_udpServer.m_sleepMillis = 0;
-
+	//m_udpServer.Init(0, 8888);
+	//m_udpServer.m_sleepMillis = 0;
+	m_serial.Open(5, 912600);
 
 	//-----------------------------------------------------------------------------------
 	// 본격적인 스켈레톤 초기화 작업
@@ -155,24 +159,24 @@ bool cViewer::OnInit()
 	//-----------------------------------------------------------------------------------
 	// 캐릭터 리타겟팅
 	{
-		m_character.Create(m_renderer, "zealot.dat");
-		if (graphic::cMesh* mesh = m_character.GetMesh("Sphere001"))
-			mesh->SetRender(false);
-		//m_character.SetShader( graphic::cResourceManager::Get()->LoadShader(
-		//	"hlsl_skinning_using_texcoord.fx") );
-		m_character.SetShader(graphic::cResourceManager::Get()->LoadShader(
-			m_renderer,
-			"hlsl_skinning_using_texcoord_sc2.fx"));
-		m_character.SetRenderShadow(true);
-		m_character.SetToolTransform({ Vector3(0,0,-20), {}, Vector3(10, 10, 10) }); // 사이즈 늘림
-
-		using namespace graphic;
-
-		vector<sActionData> actions;
-		actions.reserve(16);
-		actions.push_back(sActionData(CHARACTER_ACTION::NORMAL, "zealot_stand.ani"));
-		actions.push_back(sActionData(CHARACTER_ACTION::RUN, "zealot_walk.ani"));
-		actions.push_back(sActionData(CHARACTER_ACTION::ATTACK, "zealot_attack.ani"));
+// 		m_character.Create(m_renderer, "zealot.dat");
+// 		if (graphic::cMesh* mesh = m_character.GetMesh("Sphere001"))
+// 			mesh->SetRender(false);
+// 		//m_character.SetShader( graphic::cResourceManager::Get()->LoadShader(
+// 		//	"hlsl_skinning_using_texcoord.fx") );
+// 		m_character.SetShader(graphic::cResourceManager::Get()->LoadShader(
+// 			m_renderer,
+// 			"hlsl_skinning_using_texcoord_sc2.fx"));
+// 		m_character.SetRenderShadow(true);
+// 		m_character.SetToolTransform({ Vector3(0,0,-20), {}, Vector3(10, 10, 10) }); // 사이즈 늘림
+// 
+// 		using namespace graphic;
+// 
+// 		vector<sActionData> actions;
+// 		actions.reserve(16);
+// 		actions.push_back(sActionData(CHARACTER_ACTION::NORMAL, "zealot_stand.ani"));
+// 		actions.push_back(sActionData(CHARACTER_ACTION::RUN, "zealot_walk.ani"));
+// 		actions.push_back(sActionData(CHARACTER_ACTION::ATTACK, "zealot_attack.ani"));
 		//m_character.SetActionData(actions);
 
 		//m_character.GetBoneMgr()->FindBone("");
@@ -181,26 +185,43 @@ bool cViewer::OnInit()
 		//m_character.StartAction();
 	}
 
+
+	m_textSerial.Create(m_renderer);
+	m_textSerial.SetPos(10, 30);
+	m_textSerial.SetColor(D3DXCOLOR(1, 1, 1, 1));
+
+	m_textQuat.Create(m_renderer);
+	m_textQuat.SetPos(10, 50);
+	m_textQuat.SetColor(D3DXCOLOR(1, 1, 1, 1));
+
 	return true;
 }
 
 
 void cViewer::OnUpdate(const float elapseT)
 {
-	m_character.Move(elapseT);
+	//m_character.Move(elapseT);
 
 	char buff[512];
-	const int len = m_udpServer.GetRecvData(buff, sizeof(buff));
+	int len;
+	//string buff;
+	//const int len = m_udpServer.GetRecvData(buff, sizeof(buff));
+	m_serial.ReadStringUntil('\n', buff, len, sizeof(buff));
+	//const int len = buff.length();
 	if (len > 0)
 	{
 		if (len < sizeof(buff))
 			buff[len] = NULL;
+
+		m_textSerial.SetText(buff);
 
 		vector<string> toks;
 		common::tokenizer(buff, ",", "", toks);
 
 		if (toks.size() >= 6)
 		{
+			m_textQuat.SetText(buff);
+
 			static int cnt = 0;
 			if (m_dbgPrint)
 				dbg::Print(common::format("{%d} %s", cnt++, buff));
@@ -376,9 +397,11 @@ void cViewer::OnRender(const float elapseT)
 			}
 		}
 
-		m_character.Render(m_renderer, Matrix44::Identity);
+		//m_character.Render(m_renderer, Matrix44::Identity);
 
 		m_renderer.RenderFPS();
+		m_textSerial.Render();
+		m_textQuat.Render();
 
 		m_renderer.EndScene();
 		m_renderer.Present();
@@ -388,7 +411,6 @@ void cViewer::OnRender(const float elapseT)
 
 void cViewer::OnShutdown()
 {
-
 }
 
 
