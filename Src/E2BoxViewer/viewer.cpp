@@ -138,7 +138,11 @@ bool cViewer::OnInit()
 
 	//m_udpServer.Init(0, 8888);
 	//m_udpServer.m_sleepMillis = 0;
-	m_serial.Open(5, 912600);
+	int port = 5;
+	if (__argc > 1)
+		port = atoi(__argv[1]);
+
+	m_serial.Open(port, 912600);
 
 	//-----------------------------------------------------------------------------------
 	// 본격적인 스켈레톤 초기화 작업
