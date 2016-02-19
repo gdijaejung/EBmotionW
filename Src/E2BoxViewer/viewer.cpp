@@ -1,8 +1,7 @@
 
 #include "stdafx.h"
 #include "gbone.h"
-#include "../Common/Graphic/character/character.h"
-#include "../Common/UIComponent/BufferedSerial.h"
+ #include "../../../Common/Graphic/character/character.h"
 
 
 #include <objidl.h>
@@ -126,7 +125,7 @@ bool cViewer::OnInit()
 	const int WINSIZE_X = 1024;		//초기 윈도우 가로 크기
 	const int WINSIZE_Y = 768;	//초기 윈도우 세로 크기
 	GetMainCamera()->Init(&m_renderer);
- 	GetMainCamera()->SetCamera(Vector3(30, 30, -30), Vector3(0, 0, 0), Vector3(0, 1, 0));
+	GetMainCamera()->SetCamera(Vector3(30, 30, -30), Vector3(0, 0, 0), Vector3(0, 1, 0));
 	GetMainCamera()->SetProjection(D3DX_PI / 4.f, (float)WINSIZE_X / (float)WINSIZE_Y, 1.f, 10000.0f);
 
 	const Vector3 lightPos(300, 300, -300);
@@ -263,8 +262,8 @@ void cViewer::OnUpdate(const float elapseT)
 				Matrix44 baseTm;
 				baseTm.SetRotationYZ(Vector3(0, 1, 0), front);
 
- 				m_worldTm[id] = baseTm;
- 				m_localTm[id] = baseTm;
+				m_worldTm[id] = baseTm;
+				m_localTm[id] = baseTm;
 			}
 			else
 			{
@@ -305,7 +304,7 @@ void cViewer::OnRender(const float elapseT)
 			{
 				Vector3 charPos(20.f - ((i % 4)*5.f), 0, (i / 4)*5.f - 5.f);
 				Matrix44 t0;
- 				t0.SetPosition(charPos);
+				t0.SetPosition(charPos);
 				m_characterBone[i].Render(m_renderer, m_worldTm[i] * t0);
 			}
 
@@ -341,7 +340,7 @@ void cViewer::OnRender(const float elapseT)
 
 		}
 		else
- 		{
+		{
 			Matrix44 paletteTm[15];
 			Matrix44 incrementPaletteTm[15];
 			Vector3 mov[15] = {
@@ -378,7 +377,7 @@ void cViewer::OnRender(const float elapseT)
 				//Matrix44 tm = m_localTm[id];
 				paletteTm[id] = tm;
 
- 				Matrix44 finalTm;
+				Matrix44 finalTm;
 				if (pid < 0)
 				{
 					tm.SetIdentity();
