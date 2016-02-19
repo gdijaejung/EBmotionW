@@ -135,3 +135,4 @@ void CE2BoxManagerDoc::Dump(CDumpContext& dc) const
 
 
 // CE2BoxManagerDoc commands
+

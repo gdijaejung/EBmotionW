@@ -159,7 +159,6 @@ void CE2BoxManagerView::Update(const float deltaSeconds)
 }
 
 
-
 void CE2BoxManagerView::Render()
 {
 	RET(!m_isInitDx);
@@ -175,14 +174,12 @@ void CE2BoxManagerView::Render()
 		m_renderer.RenderGrid();
 		m_renderer.RenderAxis();
 
-
 		m_renderer.RenderFPS();
 
 		m_renderer.EndScene();
 		m_renderer.Present();
 	}
 }
-
 
 
 BOOL CE2BoxManagerView::OnEraseBkgnd(CDC* pDC)

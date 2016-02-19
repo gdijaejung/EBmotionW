@@ -103,7 +103,17 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Common\UIComponent\AutoHandle.h" />
+    <ClInclude Include="..\..\..\Common\UIComponent\AutoHeapAlloc.h" />
+    <ClInclude Include="..\..\..\Common\UIComponent\AutoHModule.h" />
+    <ClInclude Include="..\..\..\Common\UIComponent\BPCtrlAnchorMap.h" />
+    <ClInclude Include="..\..\..\Common\UIComponent\ComPortCombo.h" />
     <ClInclude Include="..\..\..\Common\UIComponent\Controller2.h" />
+    <ClInclude Include="..\..\..\Common\UIComponent\DockablePaneBase2.h" />
+    <ClInclude Include="..\..\..\Common\UIComponent\DockablePaneChildView2.h" />
+    <ClInclude Include="..\..\..\Common\UIComponent\EnumDevices.h" />
+    <ClInclude Include="..\..\..\Common\UIComponent\enumser.h" />
+    <ClInclude Include="CalibrationView.h" />
     <ClInclude Include="E2BoxManager.h" />
     <ClInclude Include="E2BoxManagerDoc.h" />
     <ClInclude Include="E2BoxManagerView.h" />
@@ -113,7 +123,13 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Common\UIComponent\ComPortCombo.cpp" />
     <ClCompile Include="..\..\..\Common\UIComponent\Controller2.cpp" />
+    <ClCompile Include="..\..\..\Common\UIComponent\DockablePaneBase2.cpp" />
+    <ClCompile Include="..\..\..\Common\UIComponent\DockablePaneChildView2.cpp" />
+    <ClCompile Include="..\..\..\Common\UIComponent\EnumDevices.cpp" />
+    <ClCompile Include="..\..\..\Common\UIComponent\enumser.cpp" />
+    <ClCompile Include="CalibrationView.cpp" />
     <ClCompile Include="E2BoxManager.cpp" />
     <ClCompile Include="E2BoxManagerDoc.cpp" />
     <ClCompile Include="E2BoxManagerView.cpp" />

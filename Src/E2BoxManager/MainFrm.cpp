@@ -6,12 +6,48 @@
 #include "E2BoxManager.h"
 
 #include "MainFrm.h"
+#include "CalibrationView.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 // CMainFrame
+
+
+#define CREATE_DOCKPANE(CLASS, DOCKNAME, PANE_ID, RESOURCE_ID, VAR)\
+{\
+	CDockablePaneBase2 *pane = new CDockablePaneBase2();\
+	if (!pane->Create(DOCKNAME, this, CRect(0, 0, 460, 500), TRUE, PANE_ID, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_LEFT | CBRS_FLOAT_MULTI))\
+				{\
+		TRACE0("Failed to create pane window\n");\
+		return FALSE;\
+				}\
+	VAR = new CLASS(pane);\
+	VAR->Create(RESOURCE_ID, pane);\
+	VAR->ShowWindow(SW_SHOW);\
+	pane->SetChildView(VAR);\
+	m_viewList.push_back(pane);\
+	HICON hClassViewIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(theApp.m_bHiColorIcons ? IDI_CLASS_VIEW_HC : IDI_CLASS_VIEW), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);\
+	pane->SetIcon(hClassViewIcon, FALSE);\
+}
+
+
+#define CREATE_DOCKPANE2(CLASS, DOCKNAME, PANE_ID, VAR) \
+	CREATE_DOCKPANE(CLASS, DOCKNAME, PANE_ID, CLASS::IDD, VAR)
+
+
+
+// ÀÏ¹Ý ºä »ý¼º
+#define CREATE_PANE(CLASS, VAR, SHOWCMD) \
+	VAR = new CLASS(this);\
+	VAR->Create(CLASS::IDD, this);\
+	m_childViewList.push_back(VAR);\
+	VAR->ShowWindow(SHOWCMD);\
+
+
+
 
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWndEx)
 
@@ -23,7 +59,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_WM_CREATE()
 	ON_COMMAND(ID_VIEW_CUSTOMIZE, &CMainFrame::OnViewCustomize)
 	ON_REGISTERED_MESSAGE(AFX_WM_CREATETOOLBAR, &CMainFrame::OnToolbarCreateNew)
-	ON_COMMAND_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_WINDOWS_7, &CMainFrame::OnApplicationLook)
+//	ON_COMMAND_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_WINDOWS_7, &CMainFrame::OnApplicationLook)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_WINDOWS_7, &CMainFrame::OnUpdateApplicationLook)
 	ON_WM_SETTINGCHANGE()
 END_MESSAGE_MAP()
@@ -38,9 +74,9 @@ static UINT indicators[] =
 
 // CMainFrame construction/destruction
 
-CMainFrame::CMainFrame()
+CMainFrame::CMainFrame() 
+	: m_calibView(NULL)
 {
-	// TODO: add member initialization code here
 	theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_VS_2008);
 }
 
@@ -72,7 +108,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	InitUserToolbars(NULL, uiFirstUserToolBarId, uiLastUserToolBarId);
 
 
-	// TODO: Delete these five lines if you don't want the toolbar and menubar to be dockable
 	EnableDocking(CBRS_ALIGN_ANY);
 
 
@@ -91,11 +126,24 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
-	CDockablePane* pTabbedBar = NULL;
 
+	if (!m_viewList.empty())
+	{
+		for each (auto &view in m_viewList)
+			view->EnableDocking(CBRS_ALIGN_ANY);
 
-	// set the visual manager and style based on persisted value
-	OnApplicationLook(theApp.m_nAppLook);
+		CDockablePaneBase2 *parentPane = m_viewList.front();
+
+		DockPane(parentPane);
+
+		CDockablePane* pTabbedBar = NULL;
+		for each (auto &view in m_viewList)
+		{
+			if (view != parentPane)
+				view->AttachToTabWnd(parentPane, DM_SHOW, TRUE, &pTabbedBar);
+		}
+	}
+
 
 	// Enable toolbar and docking window menu replacement
 	EnablePaneMenu(TRUE, ID_VIEW_CUSTOMIZE, strCustomize, ID_VIEW_TOOLBAR);
@@ -112,35 +160,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
-	// enable menu personalization (most-recently used commands)
-	// TODO: define your own basic commands, ensuring that each pulldown menu has at least one basic command.
-	CList<UINT, UINT> lstBasicCommands;
-
-	lstBasicCommands.AddTail(ID_FILE_NEW);
-	lstBasicCommands.AddTail(ID_FILE_OPEN);
-	lstBasicCommands.AddTail(ID_FILE_SAVE);
-	lstBasicCommands.AddTail(ID_FILE_PRINT);
-	lstBasicCommands.AddTail(ID_APP_EXIT);
-	lstBasicCommands.AddTail(ID_EDIT_CUT);
-	lstBasicCommands.AddTail(ID_EDIT_PASTE);
-	lstBasicCommands.AddTail(ID_EDIT_UNDO);
-	lstBasicCommands.AddTail(ID_APP_ABOUT);
-	lstBasicCommands.AddTail(ID_VIEW_STATUS_BAR);
-	lstBasicCommands.AddTail(ID_VIEW_TOOLBAR);
-	lstBasicCommands.AddTail(ID_VIEW_APPLOOK_OFF_2003);
-	lstBasicCommands.AddTail(ID_VIEW_APPLOOK_VS_2005);
-	lstBasicCommands.AddTail(ID_VIEW_APPLOOK_OFF_2007_BLUE);
-	lstBasicCommands.AddTail(ID_VIEW_APPLOOK_OFF_2007_SILVER);
-	lstBasicCommands.AddTail(ID_VIEW_APPLOOK_OFF_2007_BLACK);
-	lstBasicCommands.AddTail(ID_VIEW_APPLOOK_OFF_2007_AQUA);
-	lstBasicCommands.AddTail(ID_VIEW_APPLOOK_WINDOWS_7);
-	lstBasicCommands.AddTail(ID_SORTING_SORTALPHABETIC);
-	lstBasicCommands.AddTail(ID_SORTING_SORTBYTYPE);
-	lstBasicCommands.AddTail(ID_SORTING_SORTBYACCESS);
-	lstBasicCommands.AddTail(ID_SORTING_GROUPBYTYPE);
-
-	CMFCToolBar::SetBasicCommands(lstBasicCommands);
-
 	return 0;
 }
 
@@ -156,8 +175,11 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 BOOL CMainFrame::CreateDockingWindows()
 {
+	CREATE_DOCKPANE2(CCalibrationView, L"Calibration View", ID_VIEW_CALIBRATION, m_calibView);
 
-	SetDockingWindowIcons(theApp.m_bHiColorIcons);
+
+
+	//SetDockingWindowIcons(theApp.m_bHiColorIcons);
 	return TRUE;
 }
 
@@ -210,75 +232,6 @@ LRESULT CMainFrame::OnToolbarCreateNew(WPARAM wp,LPARAM lp)
 	return lres;
 }
 
-void CMainFrame::OnApplicationLook(UINT id)
-{
-	CWaitCursor wait;
-
-	theApp.m_nAppLook = id;
-
-	switch (theApp.m_nAppLook)
-	{
-	case ID_VIEW_APPLOOK_WIN_2000:
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManager));
-		break;
-
-	case ID_VIEW_APPLOOK_OFF_XP:
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerOfficeXP));
-		break;
-
-	case ID_VIEW_APPLOOK_WIN_XP:
-		CMFCVisualManagerWindows::m_b3DTabsXPTheme = TRUE;
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
-		break;
-
-	case ID_VIEW_APPLOOK_OFF_2003:
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerOffice2003));
-		CDockingManager::SetDockingMode(DT_SMART);
-		break;
-
-	case ID_VIEW_APPLOOK_VS_2005:
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerVS2005));
-		CDockingManager::SetDockingMode(DT_SMART);
-		break;
-
-	case ID_VIEW_APPLOOK_VS_2008:
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerVS2008));
-		CDockingManager::SetDockingMode(DT_SMART);
-		break;
-
-	case ID_VIEW_APPLOOK_WINDOWS_7:
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows7));
-		CDockingManager::SetDockingMode(DT_SMART);
-		break;
-
-	default:
-		switch (theApp.m_nAppLook)
-		{
-		case ID_VIEW_APPLOOK_OFF_2007_BLUE:
-			CMFCVisualManagerOffice2007::SetStyle(CMFCVisualManagerOffice2007::Office2007_LunaBlue);
-			break;
-
-		case ID_VIEW_APPLOOK_OFF_2007_BLACK:
-			CMFCVisualManagerOffice2007::SetStyle(CMFCVisualManagerOffice2007::Office2007_ObsidianBlack);
-			break;
-
-		case ID_VIEW_APPLOOK_OFF_2007_SILVER:
-			CMFCVisualManagerOffice2007::SetStyle(CMFCVisualManagerOffice2007::Office2007_Silver);
-			break;
-
-		case ID_VIEW_APPLOOK_OFF_2007_AQUA:
-			CMFCVisualManagerOffice2007::SetStyle(CMFCVisualManagerOffice2007::Office2007_Aqua);
-			break;
-		}
-
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerOffice2007));
-		CDockingManager::SetDockingMode(DT_SMART);
-	}
-
-	RedrawWindow(NULL, NULL, RDW_ALLCHILDREN | RDW_INVALIDATE | RDW_UPDATENOW | RDW_FRAME | RDW_ERASE);
-
-	theApp.WriteInt(_T("ApplicationLook"), theApp.m_nAppLook);
-}
 
 void CMainFrame::OnUpdateApplicationLook(CCmdUI* pCmdUI)
 {

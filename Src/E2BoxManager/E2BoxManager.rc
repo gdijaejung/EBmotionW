@@ -1,4 +1,4 @@
-//Microsoft Visual C++ generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -16,19 +16,25 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
-#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+// Korean (Korea) resources
 
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+
+#ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#ifndef APSTUDIO_INVOKED\r\n"
     "#include ""targetver.h""\r\n"
@@ -38,7 +44,7 @@ BEGIN
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_OLE_RESOURCES\r\n"
     "#define _AFX_NO_TRACKER_RESOURCES\r\n"
@@ -61,25 +67,77 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Dialog
+//
+
+IDD_DIALOG_CALIB DIALOGEX 0, 0, 297, 369
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_COMBO_SER,45,7,191,144,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Connect",IDC_BUTTON_CONNECT,240,7,50,14
+    LTEXT           "COM",IDC_STATIC,7,9,16,8
+    COMBOBOX        IDC_COMBO_SENSOR,45,23,48,170,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Sensor",IDC_STATIC,7,25,23,8
+    PUSHBUTTON      "cnxy",IDC_BUTTON_CNXY,45,54,50,14
+    PUSHBUTTON      "cnxy 180",IDC_BUTTON_CNXY180,107,54,50,14
+    PUSHBUTTON      "cnz",IDC_BUTTON_CNZ,45,74,50,14
+    PUSHBUTTON      "cnz 180",IDC_BUTTON_CNZ180,107,74,50,14
+    PUSHBUTTON      "cnxy Auto",IDC_BUTTON_CNXY_AUTO,175,54,50,14
+    EDITTEXT        IDC_EDIT_CNXY,234,54,40,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "cnxy Auto",IDC_BUTTON_CNZ_AUTO,174,74,50,14
+    EDITTEXT        IDC_EDIT_CNZ,234,74,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SER_OUTPUT,7,188,283,157,ES_MULTILINE | ES_AUTOHSCROLL | ES_WANTRETURN
+    EDITTEXT        IDC_EDIT_SER_INPUT,7,348,283,14,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_DIALOG_CALIB, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 290
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 362
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Korean (Korea) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // Icon
 //
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE 9, 1
-IDR_MAINFRAME           ICON         "res\\E2BoxManager.ico"
-IDR_E2BoxManagerTYPE         ICON         "res\\E2BoxManagerDoc.ico"
-#endif
-IDI_FILE_VIEW           ICON         "res\\file_view.ico"
-IDI_FILE_VIEW_HC        ICON         "res\\file_view_hc.ico"
-IDI_CLASS_VIEW          ICON         "res\\class_view.ico"
-IDI_CLASS_VIEW_HC       ICON         "res\\class_view_hc.ico"
-IDI_OUTPUT_WND          ICON         "res\\output_wnd.ico"
-IDI_OUTPUT_WND_HC       ICON         "res\\output_wnd_hc.ico"
-IDI_PROPERTIES_WND      ICON         "res\\properties_wnd.ico"
-IDI_PROPERTIES_WND_HC   ICON         "res\\properties_wnd_hc.ico"
+IDR_MAINFRAME           ICON                    "res\\E2BoxManager.ico"
+IDR_E2BoxManagerTYPE    ICON                    "res\\E2BoxManagerDoc.ico"
+IDI_FILE_VIEW           ICON                    "res\\file_view.ico"
+IDI_FILE_VIEW_HC        ICON                    "res\\file_view_hc.ico"
+IDI_CLASS_VIEW          ICON                    "res\\class_view.ico"
+IDI_CLASS_VIEW_HC       ICON                    "res\\class_view_hc.ico"
+IDI_OUTPUT_WND          ICON                    "res\\output_wnd.ico"
+IDI_OUTPUT_WND_HC       ICON                    "res\\output_wnd_hc.ico"
+IDI_PROPERTIES_WND      ICON                    "res\\properties_wnd.ico"
+IDI_PROPERTIES_WND_HC   ICON                    "res\\properties_wnd_hc.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -134,7 +192,6 @@ BEGIN
     BUTTON      ID_APP_ABOUT
 END
 
-
 IDR_SORT TOOLBAR 16, 15
 BEGIN
     BUTTON      ID_SORT_MENU
@@ -166,8 +223,7 @@ BEGIN
     BUTTON      ID_PROPERTIES1
     BUTTON      ID_PROPERTIES2
 END
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE 9, 1
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -187,7 +243,7 @@ BEGIN
         MENUITEM "Print Pre&view",              ID_FILE_PRINT_PREVIEW
         MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
         MENUITEM SEPARATOR
-        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1,GRAYED
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_APP_EXIT
     END
@@ -203,41 +259,39 @@ BEGIN
     BEGIN
         POPUP "&Toolbars and Docking Windows"
         BEGIN
-            MENUITEM "<placeholder>",           ID_VIEW_TOOLBAR
+            MENUITEM "<placeholder>",               ID_VIEW_TOOLBAR
         END
         MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
         POPUP "&Application Look"
         BEGIN
-            MENUITEM "Windows &2000",           ID_VIEW_APPLOOK_WIN_2000
-            MENUITEM "Office &XP",              ID_VIEW_APPLOOK_OFF_XP
-            MENUITEM "&Windows XP",             ID_VIEW_APPLOOK_WIN_XP
-            MENUITEM "Office 200&3",            ID_VIEW_APPLOOK_OFF_2003
-            MENUITEM "Visual Studio 200&5",     ID_VIEW_APPLOOK_VS_2005
-            MENUITEM "Visual Studio 200&8",     ID_VIEW_APPLOOK_VS_2008
+            MENUITEM "Windows &2000",               ID_VIEW_APPLOOK_WIN_2000
+            MENUITEM "Office &XP",                  ID_VIEW_APPLOOK_OFF_XP
+            MENUITEM "&Windows XP",                 ID_VIEW_APPLOOK_WIN_XP
+            MENUITEM "Office 200&3",                ID_VIEW_APPLOOK_OFF_2003
+            MENUITEM "Visual Studio 200&5",         ID_VIEW_APPLOOK_VS_2005
+            MENUITEM "Visual Studio 200&8",         ID_VIEW_APPLOOK_VS_2008
             POPUP "Office 200&7"
             BEGIN
-                MENUITEM "&Blue Style",         ID_VIEW_APPLOOK_OFF_2007_BLUE
-                MENUITEM "B&lack Style",        ID_VIEW_APPLOOK_OFF_2007_BLACK
-                MENUITEM "&Silver Style",       ID_VIEW_APPLOOK_OFF_2007_SILVER
-                MENUITEM "&Aqua Style",         ID_VIEW_APPLOOK_OFF_2007_AQUA
+                MENUITEM "&Blue Style",                 ID_VIEW_APPLOOK_OFF_2007_BLUE
+                MENUITEM "B&lack Style",                ID_VIEW_APPLOOK_OFF_2007_BLACK
+                MENUITEM "&Silver Style",               ID_VIEW_APPLOOK_OFF_2007_SILVER
+                MENUITEM "&Aqua Style",                 ID_VIEW_APPLOOK_OFF_2007_AQUA
             END
         END
     END
     POPUP "&Help"
     BEGIN
-        MENUITEM "&About E2BoxManager...",          ID_APP_ABOUT
+        MENUITEM "&About E2BoxManager...",      ID_APP_ABOUT
     END
 END
 
-
-
 IDR_POPUP_EDIT MENU
 BEGIN
-	POPUP "Edit"
-	BEGIN
-		MENUITEM "Cu&t\tCtrl+X",            ID_EDIT_CUT
-		MENUITEM "&Copy\tCtrl+C",           ID_EDIT_COPY
-		MENUITEM "&Paste\tCtrl+V",          ID_EDIT_PASTE
+    POPUP "Edit"
+    BEGIN
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
     END
 END
 
@@ -280,19 +334,20 @@ BEGIN
     END
 END
 
-IDR_HELP_MENU MENU 
+IDR_HELP_MENU MENU
 BEGIN
-    MENUITEM "&About E2BoxManager...",          ID_APP_ABOUT
+    MENUITEM "&About E2BoxManager...",      ID_APP_ABOUT
 END
 
 IDR_THEME_MENU MENU
 BEGIN
-    MENUITEM "Office 2007 (&Blue Style)",       ID_VIEW_APPLOOK_OFF_2007_BLUE
-    MENUITEM "Office 2007 (B&lack Style)",      ID_VIEW_APPLOOK_OFF_2007_BLACK
-    MENUITEM "Office 2007 (&Silver Style)",     ID_VIEW_APPLOOK_OFF_2007_SILVER
-    MENUITEM "Office 2007 (&Aqua Style)",       ID_VIEW_APPLOOK_OFF_2007_AQUA
-    MENUITEM "Win&dows 7",                      ID_VIEW_APPLOOK_WINDOWS_7
+    MENUITEM "Office 2007 (&Blue Style)",   ID_VIEW_APPLOOK_OFF_2007_BLUE
+    MENUITEM "Office 2007 (B&lack Style)",  ID_VIEW_APPLOOK_OFF_2007_BLACK
+    MENUITEM "Office 2007 (&Silver Style)", ID_VIEW_APPLOOK_OFF_2007_SILVER
+    MENUITEM "Office 2007 (&Aqua Style)",   ID_VIEW_APPLOOK_OFF_2007_AQUA
+    MENUITEM "Win&dows 7",                  ID_VIEW_APPLOOK_WINDOWS_7
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -301,23 +356,21 @@ END
 
 IDR_MAINFRAME ACCELERATORS
 BEGIN
-    "N",            ID_FILE_NEW,            VIRTKEY,CONTROL
-    "O",            ID_FILE_OPEN,           VIRTKEY,CONTROL
-    "S",            ID_FILE_SAVE,           VIRTKEY,CONTROL
-    "P",            ID_FILE_PRINT,          VIRTKEY,CONTROL
-	"Z",            ID_EDIT_UNDO,           VIRTKEY,CONTROL
-	"X",            ID_EDIT_CUT,            VIRTKEY,CONTROL
-	"C",            ID_EDIT_COPY,           VIRTKEY,CONTROL
-	"V",            ID_EDIT_PASTE,          VIRTKEY,CONTROL
-    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY,ALT
-    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY,SHIFT
-    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY,CONTROL
-    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY,SHIFT
-    VK_F6,          ID_NEXT_PANE,           VIRTKEY
-    VK_F6,          ID_PREV_PANE,           VIRTKEY,SHIFT
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
 END
-
-
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -328,7 +381,7 @@ END
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About E2BoxManager"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
     LTEXT           "E2BoxManager, Version 1.0",IDC_STATIC,42,14,114,8,SS_NOPREFIX
@@ -337,24 +390,23 @@ BEGIN
 END
 
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
-VS_VERSION_INFO     VERSIONINFO
-  FILEVERSION       1,0,0,1
-  PRODUCTVERSION    1,0,0,1
- FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
- FILEFLAGS VS_FF_DEBUG
+ FILEFLAGS 0x1L
 #else
  FILEFLAGS 0x0L
 #endif
- FILEOS VOS_NT_WINDOWS32
- FILETYPE VFT_APP
- FILESUBTYPE VFT2_UNKNOWN
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
@@ -362,19 +414,20 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "TODO: <Company name>"
             VALUE "FileDescription", "E2BoxManager"
-            VALUE "FileVersion",     "1.0.0.1"
-            VALUE "InternalName",    "E2BoxManager.exe"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "E2BoxManager.exe"
             VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
-            VALUE "OriginalFilename","E2BoxManager.exe"
+            VALUE "OriginalFilename", "E2BoxManager.exe"
             VALUE "ProductName", "TODO: <Product name>"
-            VALUE "ProductVersion",  "1.0.0.1"
+            VALUE "ProductVersion", "1.0.0.1"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x0409, 1200
+        VALUE "Translation", 0x409, 1200
     END
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -394,6 +447,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
@@ -401,19 +455,20 @@ END
 
 STRINGTABLE
 BEGIN
-    IDP_OLE_INIT_FAILED       "OLE initialization failed.  Make sure that the OLE libraries are the correct version."
+    IDP_OLE_INIT_FAILED     "OLE initialization failed.  Make sure that the OLE libraries are the correct version."
 END
+
 STRINGTABLE
 BEGIN
-// Non-mac-targeting apps remove the two extra substrings
     IDR_MAINFRAME           "E2BoxManager\n\nE2BoxManager\n\n\nE2BoxManager.Document\nE2BoxManager.Document"
-
 END
+
 STRINGTABLE
 BEGIN
     AFX_IDS_APP_TITLE       "E2BoxManager"
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
+
 STRINGTABLE
 BEGIN
     ID_INDICATOR_EXT        "EXT"
@@ -423,6 +478,7 @@ BEGIN
     ID_INDICATOR_OVR        "OVR"
     ID_INDICATOR_REC        "REC"
 END
+
 STRINGTABLE
 BEGIN
     ID_FILE_NEW             "Create a new document\nNew"
@@ -432,11 +488,19 @@ BEGIN
     ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
     ID_FILE_PAGE_SETUP      "Change the printing options\nPage Setup"
     ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
-    ID_FILE_PRINT_DIRECT    "Print the active document using current options\nQuick Print"
     ID_FILE_PRINT           "Print the active document\nPrint"
+    ID_FILE_PRINT_DIRECT    "Print the active document using current options\nQuick Print"
     ID_FILE_PRINT_PREVIEW   "Display full pages\nPrint Preview"
+END
+
+STRINGTABLE
+BEGIN
     ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
     ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE
+BEGIN
     ID_FILE_MRU_FILE1       "Open this document"
     ID_FILE_MRU_FILE2       "Open this document"
     ID_FILE_MRU_FILE3       "Open this document"
@@ -453,9 +517,21 @@ BEGIN
     ID_FILE_MRU_FILE14      "Open this document"
     ID_FILE_MRU_FILE15      "Open this document"
     ID_FILE_MRU_FILE16      "Open this document"
+END
+
+STRINGTABLE
+BEGIN
     ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
     ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE
+BEGIN
     ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE
+BEGIN
     ID_EDIT_CLEAR           "Erase the selection\nErase"
     ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
     ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
@@ -467,6 +543,10 @@ BEGIN
     ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
     ID_EDIT_UNDO            "Undo the last action\nUndo"
     ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE
+BEGIN
     ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle Status Bar"
 END
 
@@ -479,11 +559,18 @@ BEGIN
     AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
     AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
     AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
-    AFX_IDS_SCRESTORE       "Restore the window to normal size"
-    AFX_IDS_SCTASKLIST      "Activate Task List"
-    AFX_IDS_PREVIEW_CLOSE   "Close print preview mode\nCancel Preview"
 END
 
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_PREVIEW_CLOSE   "Close print preview mode\nCancel Preview"
+END
 
 STRINGTABLE
 BEGIN
@@ -491,35 +578,53 @@ BEGIN
     IDS_STATUS_PANE2        "Pane 2"
     IDS_TOOLBAR_STANDARD    "Standard"
     IDS_TOOLBAR_CUSTOMIZE   "Customize..."
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_VIEW           "File View"
     IDS_CLASS_VIEW          "Class View"
-    IDS_EXPLORER            "Explorer"
     IDS_OUTPUT_WND          "Output"
+    IDS_PROPERTIES_WND      "Properties"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_EXPLORER            "Explorer"
+    IDS_EDIT_MENU           "Edit"
+END
+
+STRINGTABLE
+BEGIN
     IDS_BUILD_TAB           "Build"
     IDS_DEBUG_TAB           "Debug"
     IDS_FIND_TAB            "Find"
-    IDS_PROPERTIES_WND      "Properties"
-    IDS_EDIT_MENU           "Edit"
 END
-#endif
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
 #define _AFX_NO_OLE_RESOURCES
 #define _AFX_NO_TRACKER_RESOURCES
 #define _AFX_NO_PROPERTY_RESOURCES
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE 9, 1
-#include "res\\E2BoxManager.rc2"  // non-Microsoft Visual C++ edited resources
+#include "res\E2BoxManager.rc2"  // non-Microsoft Visual C++ edited resources
 #include "afxres.rc"      // Standard components
-#include "afxprint.rc"  // printing/print preview resources
+#include "afxprint.rc"    // printing/print preview resources
 #if !defined(_AFXDLL)
 #include "afxribbon.rc"        // MFC ribbon and control bar resources
 #endif
 #endif
+
+/////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+

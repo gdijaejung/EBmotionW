@@ -45,6 +45,36 @@
     <ClInclude Include="..\..\..\Common\UIComponent\Controller2.h">
       <Filter>UIComponent</Filter>
     </ClInclude>
+    <ClInclude Include="CalibrationView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\UIComponent\AutoHandle.h">
+      <Filter>UIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\UIComponent\AutoHeapAlloc.h">
+      <Filter>UIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\UIComponent\AutoHModule.h">
+      <Filter>UIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\UIComponent\BPCtrlAnchorMap.h">
+      <Filter>UIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\UIComponent\ComPortCombo.h">
+      <Filter>UIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\UIComponent\EnumDevices.h">
+      <Filter>UIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\UIComponent\enumser.h">
+      <Filter>UIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\UIComponent\DockablePaneChildView2.h">
+      <Filter>UIComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\UIComponent\DockablePaneBase2.h">
+      <Filter>UIComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="E2BoxManager.cpp">
@@ -63,6 +93,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\UIComponent\Controller2.cpp">
+      <Filter>UIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="CalibrationView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\UIComponent\ComPortCombo.cpp">
+      <Filter>UIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\UIComponent\EnumDevices.cpp">
+      <Filter>UIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\UIComponent\enumser.cpp">
+      <Filter>UIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\UIComponent\DockablePaneChildView2.cpp">
+      <Filter>UIComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\UIComponent\DockablePaneBase2.cpp">
       <Filter>UIComponent</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,6 +4,7 @@
 
 #pragma once
 
+class CCalibrationView;
 class CMainFrame : public CFrameWndEx
 {
 	
@@ -14,8 +15,12 @@ protected: // create from serialization only
 // Attributes
 public:
 
-// Operations
-public:
+
+	CCalibrationView *m_calibView;
+
+	list<CDockablePaneBase2*> m_viewList;
+	list<CDockablePaneChildView2*> m_childViewList;
+
 
 // Overrides
 public:
@@ -38,7 +43,7 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnViewCustomize();
 	afx_msg LRESULT OnToolbarCreateNew(WPARAM wp, LPARAM lp);
-	afx_msg void OnApplicationLook(UINT id);
+//	afx_msg void OnApplicationLook(UINT id);
 	afx_msg void OnUpdateApplicationLook(CCmdUI* pCmdUI);
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
 	DECLARE_MESSAGE_MAP()

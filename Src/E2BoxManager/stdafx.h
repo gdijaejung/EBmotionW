@@ -53,12 +53,19 @@
 
 
 
-
 #include "../../../Common/Common/common.h"
 #include "../../../Common/Graphic/graphic.h"
 #include "../../../Common/Network/network.h"
 #include "../../../Common/UIComponent/uicomponent.h"
+#include <WBemCli.h>
+#include <winspool.h>
 #include <mmsystem.h>
 #include <fstream>
 
+
+
+
+enum VIEW_TYPE {
+	ID_VIEW_CALIBRATION = 10001,
+};
 
